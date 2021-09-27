@@ -7,6 +7,9 @@ import 'package:flutter_examples/screens/provider/classes/future.dart';
 import 'package:flutter_examples/screens/provider/classes/slider.dart';
 import 'package:flutter_examples/screens/provider/classes/stream.dart';
 import 'package:flutter_examples/screens/provider/provider_example.dart';
+import 'package:flutter_examples/screens/provider_list/models/cart.dart';
+import 'package:flutter_examples/screens/provider_list/models/product.dart';
+import 'package:flutter_examples/screens/provider_list/provider_list.dart';
 import 'package:provider/provider.dart';
 
 class DispatcherScreen extends StatefulWidget {
@@ -18,7 +21,7 @@ class DispatcherScreen extends StatefulWidget {
 
 class DispatcherScreenState extends State<DispatcherScreen> {
 
-  var listItems = ["Provider"];
+  var listItems = ["Provider", "Provider List"];
 
   @override
   void initState() {
@@ -56,6 +59,14 @@ class DispatcherScreenState extends State<DispatcherScreen> {
                               child: ProviderExampleScreen() )
                       )
                   );
+                }
+                break;
+                case "Provider List" : {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => ProviderListScreen())
+                      ); //
                 }
                 break;
               }

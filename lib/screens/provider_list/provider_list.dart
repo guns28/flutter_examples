@@ -1,5 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_examples/screens/provider/classes/counter.dart';
 import 'package:flutter_examples/screens/provider_list/models/product.dart';
+import 'package:flutter_examples/screens/provider_list/photo_hero.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -53,6 +58,9 @@ class _MyListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    timeDilation = 2.0;
+    var itemCount = 0;
+
     var item = context.select<ProductModel, Item>(
       // Here, we are only interested in the item at [index]. We don't care
       // about any other change.
@@ -89,60 +97,98 @@ class _MyListItem extends StatelessWidget {
                         style:  GoogleFonts.aBeeZee(
                             textStyle:TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold)),
                       ),
-                      _AddButton(item: item)
                     ],
                   ),
-                  Image.asset(item.image, height: 180, width: 140,)
+                  PhotoHero(
+                    photo: item.image,
+                    width: 140,
+                      height: 180,
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (BuildContext context) {
+                            return Scaffold(
+                              appBar: AppBar(
+                                elevation: 0,
+                                toolbarHeight: 120,
+                                title: Text(item.name,
+                                    textAlign: TextAlign.center,
+                                    style:  GoogleFonts.aBeeZee(
+                                        textStyle: TextStyle(
+                                            fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white
+                                        ))),
+                              ),
+                              body: Container(
+                                // The blue background emphasizes that it's a new route.
+                                color: item.backgroundColor,
+                                padding: const EdgeInsets.all(16.0),
+                                alignment: Alignment.topCenter,
+                                child:Column(
+                                  children: [
+                                    PhotoHero(
+                                      photo: item.image,
+                                      width: 300.0,
+                                      height: 300.0,
+                                      onTap: () {
+                                        Navigator.of(context).pop();
+                                      }, key: Key("key"),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      "Start from \$${item.price}.00",
+                                      style:  GoogleFonts.aBeeZee(
+                                          textStyle:TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold)),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () =>
+                                                context.read<CounterProv>().decrement(),
+                                            icon: Icon(Icons.remove_circle_outline, size: 45)),
+                                        Text(context.watch<CounterProv>().count.toString(),
+                                            style: TextStyle(fontSize: 26, color: Colors.white)),
+                                        IconButton(
+                                            onPressed: () =>
+                                                context.read<CounterProv>().increment(),
+                                            icon: Icon(Icons.add_circle_outline, size: 45)),
+
+                                      ],
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        itemCount = Provider.of<CounterProv>(context, listen: false).count;
+                                        print(itemCount);
+                                        var cart = context.read<CartModel>();
+                                        for(var i = 1;i <= itemCount;i++ ){
+                                          cart.add(item);
+                                        }
+                                        context.read<CounterProv>().reset();
+                                      },
+                                      style: ButtonStyle(
+                                        overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                                          if (states.contains(MaterialState.pressed)) {
+                                            return Theme.of(context).primaryColor;
+                                          }
+                                          return null; // Defer to the widget's default.
+                                        }),
+                                      ),
+                                      child: Text('ADD TO CART', style: TextStyle(color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ),
+                            );
+                          }
+                      ));
+                    }, key: Key("key"),
+                  )
                 ],
               ),
             ],
           )
-      ),
-    );
-  }
-}
-
-class _AddButton extends StatelessWidget {
-  final Item item;
-
-  const _AddButton({required this.item, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // The context.select() method will let you listen to changes to
-    // a *part* of a model. You define a function that "selects" (i.e. returns)
-    // the part you're interested in, and the provider package will not rebuild
-    // this widget unless that particular part of the model changes.
-    //
-    // This can lead to significant performance improvements.
-    var isInCart = context.select<CartModel, bool>(
-      // Here, we are only interested whether [item] is inside the cart.
-      (test) => test.items.contains(item),
-    );
-
-    return Container(
-      child: TextButton(
-        onPressed: isInCart
-            ? null
-            : () {
-          // If the item is not in cart, we let the user add it.
-          // We are using context.read() here because the callback
-          // is executed whenever the user taps the button. In other
-          // words, it is executed outside the build method.
-          var cart = context.read<CartModel>();
-          cart.add(item);
-        },
-        style: ButtonStyle(
-          overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
-            if (states.contains(MaterialState.pressed)) {
-              return Theme.of(context).primaryColor;
-            }
-            return null; // Defer to the widget's default.
-          }),
-        ),
-        child: isInCart
-            ? const Icon(Icons.check, semanticLabel: 'ADDED')
-            : const Text('ADD', style: TextStyle(color: Colors.black),),
       ),
     );
   }

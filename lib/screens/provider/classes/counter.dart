@@ -14,4 +14,9 @@ class CounterProv with ChangeNotifier {
     _count--;
     notifyListeners();
   }
+
+  void reset() {
+    _count = 0;
+    notifyListeners();
+  }
 }

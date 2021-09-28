@@ -1,14 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_examples/global/routes.dart';
 import 'package:flutter_examples/screens/provider/classes/counter.dart';
 import 'package:flutter_examples/screens/provider/classes/future.dart';
 import 'package:flutter_examples/screens/provider/classes/slider.dart';
 import 'package:flutter_examples/screens/provider/classes/stream.dart';
 import 'package:flutter_examples/screens/provider/provider_example.dart';
-import 'package:flutter_examples/screens/provider_list/models/cart.dart';
-import 'package:flutter_examples/screens/provider_list/models/product.dart';
 import 'package:flutter_examples/screens/provider_list/provider_list.dart';
 import 'package:provider/provider.dart';
 
@@ -42,14 +37,14 @@ class DispatcherScreenState extends State<DispatcherScreen> {
           return GestureDetector(
             onTap: (){
 
-              switch (listItems[index]) {
-                case "Provider" : {
+              switch (index) {
+                case 0 : {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (BuildContext context) =>  MultiProvider(
                               providers: [
-                                ChangeNotifierProvider(create: (_) => CounterProv()),
+
                                 ChangeNotifierProvider(create: (_) => SliderProv()),
                                 FutureProvider(
                                     create: (_) => FutureProv().getFutureValue(),
@@ -61,7 +56,7 @@ class DispatcherScreenState extends State<DispatcherScreen> {
                   );
                 }
                 break;
-                case "Provider List" : {
+                case 1 : {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -69,6 +64,7 @@ class DispatcherScreenState extends State<DispatcherScreen> {
                       ); //
                 }
                 break;
+
               }
 
 
